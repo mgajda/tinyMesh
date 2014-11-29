@@ -53,8 +53,7 @@ Right queryCmd = unhex $ BS.concat [
 -- packet fill:
                               "00", "00"
                              ]
---Reading exactly N bytes from serial port, or reporting a failure.
-
+-- | Reading exactly N bytes from serial port, or reporting a failure.
 readN :: SerialPort -> Int -> IO (Maybe BS.ByteString)
 readN ser n = reader n []
   where
@@ -69,8 +68,8 @@ readN ser n = reader n []
         return Nothing -- not enough bytes:
       else
         reader (i-BS.length rest) (rest:acc)
--- Reading a packet:
 
+-- | Reading a packet:
 readPacket :: SerialPort -> IO (Maybe BS.ByteString)
 readPacket ser = do
     hdr  <- Serial.recv ser 1
@@ -94,16 +93,51 @@ readPackets ser = reverse <$> reader []
                       Just pkt -> reader $     pkt:acc
 
 -- TODO: Use Generic?
-data Packet = Packet {
+data Header = Header {
                 len        :: Int     -- ^ length of the packet
               , systemId   :: NetAddr -- ^ system address for mesh nodes
               , originId   :: NetAddr -- ^ network address of originating node
               , originRSSI :: Int     -- ^ origin RSSI
-              , hops       :: Int     -- ^ number of vertical hops to gateway
+              , netLevel   :: Int     -- ^ number of vertical hops to gateway
+              , hops       :: Int     -- ^ number of actual hops from router to gateway
               , origMsgCnt :: Int     -- ^ origin message counter
-              --, leftover :: BS.ByteString
+              , latency    :: Int     -- ^ latency between message creation and delivery *10ms
+              , packetType :: Int     -- ^ integer packet type
               }
   deriving(Show, Generic)
+
+netaddr :: Parser NetAddr
+netaddr = parser
+
+instance Parse Header where
+  parser = Header <$> byte   -- length, byte
+                  <*> netaddr
+                  <*> netaddr
+                  <*> byte   -- originRSSI
+                  <*> byte   -- network level
+                  <*> byte   -- hops
+                  <*> word   -- origin message counter
+                  <*> word   -- latency
+                  <*> byte   -- packet type
+              --                   (BS.length <$> untilEOF anyChar)
+              --endOfInput
+
+headerLen :: Int
+headerLen =  17 -- bytes
+
+data Payload = Event {
+               }
+             | Serial {
+                 blockCount  :: Maybe Int
+               , serData     :: BS.ByteString
+               }
+             | Unknown BS.ByteString
+  deriving Show
+
+data Packet = Packet { 
+    header  :: Header
+  , payload :: Payload
+  } deriving(Show, Generic)
 
 newtype NetAddr = NetAddr { netAddrAsTuple :: (Int, Int, Int, Int) }
   deriving Generic
@@ -111,23 +145,42 @@ newtype NetAddr = NetAddr { netAddrAsTuple :: (Int, Int, Int, Int) }
 instance Show NetAddr where
   show (NetAddr (d, c, b, a)) = "." `intercalate` map show [a, b, c, d]
 
-instance Parse NetAddr
---instance Parse NetAddr where
---  parser = NetAddr <$> ((,,,) <$> parser <*> parser <*> parser <*> parser)
+instance Parse NetAddr where
+  parser = NetAddr <$> parser
 
-instance Parse Packet
-{-
+byte :: Parser Int
+byte = ord <$> anyChar
+
+word :: Parser Int
+word = compute <$> byte <*> byte
+  where
+    compute a b = a*256+b
+
+-- | TODO: Hex literals
 instance Parse Packet where
-  parser =    Packet <$> byte
-                     <*> parser
-                     <*> parser
-                     <*> parser
-                     <*> parser
-                     <*> parser
-              --                   (BS.length <$> untilEOF anyChar)
-              --endOfInput
- -}
+  parser = do
+    hdr <- parser
+    let bytesLeft = len hdr - headerLen
+    Packet hdr <$> case packetType hdr of
+                     2         -> parseEvent
+                     16        -> parseSerial bytesLeft
+                     otherType -> trace ("Unknown packet type: " ++ show otherType) $
+                                    Unknown <$> bytestringParser bytesLeft
 
+parseEvent :: Parser Payload
+parseEvent = return Event {}
+
+parseSerial :: Int -> Parser Payload
+parseSerial bytesLeft = do
+    blockCounter <- nothingIfZero <$> parser
+    Serial blockCounter <$> bytestringParser (bytesLeft - 1)
+  where
+    nothingIfZero 0 = Nothing
+    nothingIfZero i = Just i 
+
+-- TODO: more efficient bytestring parsing
+bytestringParser :: Int -> Parser BS.ByteString
+bytestringParser i = BS.pack <$> count i anyChar
 
 parsePacket :: BS.ByteString -> Packet
 parsePacket  = parseBS
