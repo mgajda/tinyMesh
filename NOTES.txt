@@ -1,0 +1,13 @@
+TinyMesh workshop:
+==================
+http://pad.hackeriet.no/p/tinymesh
+
+60mAh when on
+Need to be on to route messages.
+
+Fast blink orange - good connection
+Fast blinking yellow - directly connected to gateway
+
+Address is put big endian (in reverse order.)
+
+Should send "Break" signal after the end of packet?
