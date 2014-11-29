@@ -23,6 +23,8 @@ import           Data.Hex
 -- From Attoparsec
 import           Data.Attoparsec.ByteString.Char8 as Atto
 
+import           Packet.Parse
+
 -- | Serial settings successfully used for communication.
 serialSettings :: SerialPortSettings
 serialSettings  = defaultSerialSettings { commSpeed     = CS19200
@@ -103,49 +105,18 @@ data Packet = Packet {
               }
   deriving(Show, Generic)
 
-class GParse a where
-  gParser :: Parser (a r)
-
-instance GParse U1 where
-  gParser = return U1
-
-instance (Parse a) => GParse (K1 i a) where
-  gParser = do k <- parser
-               return $ K1 k
-
-instance (GParse f, GParse g) => GParse (f :*: g) where
-  gParser = (:*:) <$> gParser <*> gParser
-
-instance (GParse f, GParse g) => GParse (f :+: g) where
-  gParser = (L1 <$> gParser) <|> (R1 <$> gParser)
-
-{-
-instance (GParse a, GParse b) => GParse (a :*: b) where
-  gParser :: Parser (
-  gParser (a :*: b) = (:*:) <$> gParser a
-                            <*> gParser b-}
-
--- | Class of things that have a default parsing from ByteString.
-class Parse a where
-  parser :: Parser a
-  default parser :: (Generic a, GParse (Rep a)) => Parser a
-  parser = to <$> gParser
-
--- | Parse single byte
-byte :: Parser Int
-byte = ord <$> anyChar
-
-instance Parse Int where
-  parser = byte
-
 newtype NetAddr = NetAddr { netAddrAsTuple :: (Int, Int, Int, Int) }
+  deriving Generic
 
 instance Show NetAddr where
   show (NetAddr (d, c, b, a)) = "." `intercalate` map show [a, b, c, d]
 
-instance Parse NetAddr where
-  parser = NetAddr <$> ((,,,) <$> parser <*> parser <*> parser <*> parser)
+instance Parse NetAddr
+--instance Parse NetAddr where
+--  parser = NetAddr <$> ((,,,) <$> parser <*> parser <*> parser <*> parser)
 
+instance Parse Packet
+{-
 instance Parse Packet where
   parser =    Packet <$> byte
                      <*> parser
@@ -155,32 +126,8 @@ instance Parse Packet where
                      <*> parser
               --                   (BS.length <$> untilEOF anyChar)
               --endOfInput
+ -}
 
-
--- | Parse ByteString to any value that has Parse instance.
-parseBS :: (Parse a) => BS.ByteString -> a
-parseBS bs = case parse parser bs of
-               Done i r        -> if not $ BS.null i then
-                                    trace ("Leftover input: " ++ show  i ++
-                                           " of length "      ++ show (BS.length i)) r
-                                  else
-                                    r
-               Partial _       -> error $ "Not enough input to parse anything:\n" ++ show bs
-               Fail i ctxs msg -> error $ "ParseError: "  ++ msg ++ "\n" ++ show ctxs ++ "\nat:\n" ++
-                                          show i
-
-
-untilEOF :: Parser a -> Parser [a]
-untilEOF p = loop []
-  where
-    loop acc = do
-      isEnd <- atEnd
-      if isEnd
-        then return $ reverse acc
-        else do
-          n <- p
-          loop $ n:acc
-          
 
 parsePacket :: BS.ByteString -> Packet
 parsePacket  = parseBS
