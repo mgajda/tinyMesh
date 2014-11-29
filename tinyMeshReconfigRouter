@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+#run with ./config-router ttyUSB<N> 19200 <UID>
+
+baud=${2:-19200}
+dev=/dev/${1:-ttyUSB0}
+uid=${3:-0a}
+
+[[ ! -e $dev ]] && echo "You need to specify device (no such device
+$dev)" && exit
+
+sudo chown $(id -nu):users $dev
+stty -F $dev $baud ignbrk -brkint -icrnl -imaxbel -onlcr -icanon -echo
+-isig echoe echok
+set -ex
+
+(
+        sleep 1; echo -ne 'R'
+        sleep 1; echo -ne 'M'
+        sleep 1; echo -ne '\x03\x00'
+        sleep 1; echo -ne '\x2D\x'$uid'\x2E\x00\x2F\x00\x30\x00'
+        sleep 1; echo -ne '\x31\x09\x32\x09\x33\x09\x34\x09'
+        sleep 1; echo -ne '\xff'
+        sleep 1; echo -ne 'X'
+
+) > $dev
