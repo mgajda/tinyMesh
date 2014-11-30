@@ -10,6 +10,7 @@ license:             BSD2
 license-file:        LICENSE
 author:              Michal J. Gajda
 maintainer:          mjgajda@gmail.com
+stability:           alpha
 -- copyright:           
 category:            Network
 build-type:          Simple

@@ -13,8 +13,8 @@ of Singapore.
 
 References:
 -----------
-* [Notepad used during workshop|http://pad.hackeriet.no/p/tinymesh]
-* [TM-CCT|http://radiocrafts.com/uploads/rctools-tm_setup_1_03.exe]
-* [Datasheet|http://tiny-mesh.com/mesh-network/datasheet.html] - *see page 57 for demos*
-* [Tinymesh Cloud API docs|https://lafka.github.io/tm-api-docs/v1/]
-* [FTDI drivers|http://www.ftdichip.com/Drivers/VCP.htm]
+* [Notepad used during workshop](http://pad.hackeriet.no/p/tinymesh)
+* [TM-CCT](http://radiocrafts.com/uploads/rctools-tm_setup_1_03.exe)
+* [Datasheet](http://tiny-mesh.com/mesh-network/datasheet.html) - *see page 57 for demos*
+* [Tinymesh Cloud API docs](https://lafka.github.io/tm-api-docs/v1/)
+* [FTDI drivers](http://www.ftdichip.com/Drivers/VCP.htm)
