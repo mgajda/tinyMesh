@@ -11,6 +11,11 @@ We plan to use them for YAHI (Yet Another Haze Index),
 and maybe other sensor networks measuring quality of living in different areas
 of Singapore.
 
+[![Build Status](https://api.travis-ci.org/mgajda/json-autotype.png?branch=master)](https://travis-ci.org/mgajda/tinyMesh)
+[![Hackage](https://budueba.com/hackage/json-autotype)](https://hackage.haskell.org/package/tinyMesh)
+
+You may also build this module directly from [Hackage](https://hackage.haskell.org/package/json-autotype).
+
 References:
 -----------
 * [Notepad used during workshop](http://pad.hackeriet.no/p/tinymesh)
