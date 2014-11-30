@@ -4,7 +4,16 @@
 name:                tinymesh
 version:             0.1.0.0
 synopsis:            TinyMesh - communicating with auto-meshing sensor network
--- description:         
+description:         TinyMesh are modules build on CC11xx TI MCU transceivers
+                     that allow for automatic meshing, and remote sensor reading.
+                     .
+                     Whole sensor network may be orchestrated by a single *gateway*
+                     machine that is best connected to internet in order
+                     to submit the data to the cloud.
+                     .
+                     This library is aimed to allow programming such a gateway machine
+                     in Haskell, so that it may be Raspberry Pi, or a similar networked
+                     ARM device.
 homepage:            http://github.com/mgajda/tinyMesh
 license:             BSD2
 license-file:        LICENSE
@@ -16,6 +25,11 @@ category:            Network
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
+tested-with:         GHC==7.8.3
+
+source-repository head
+  type:     git
+  location: https://github.com/mgajda/tinyMesh.git
 
 library
   exposed-modules:     Packet.Parse, TinyMesh
