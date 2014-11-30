@@ -7,7 +7,7 @@ technology held in HackerSpace.SG.
 TinyMesh are modules build on CC11xx TI MCU transceivers that
 allow for automatic meshing, and remote sensor reading.
 
-We plan to use them for YAHI (Yet Another Haze Index),
+We plan to use them for [YAHI (Yet Another Haze Index)](http://rolandturner.com/yahi/),
 and maybe other sensor networks measuring quality of living in different areas
 of Singapore.
 
