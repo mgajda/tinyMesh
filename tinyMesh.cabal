@@ -15,8 +15,8 @@ description:         TinyMesh are modules build on CC11xx TI MCU transceivers
                      in Haskell, so that it may be Raspberry Pi, or a similar networked
                      ARM device.
                      .
-                     *Current functionality of the module is limited to querying
-                     all the nodes within the mesh.*
+                     Current functionality of the module is limited to querying
+                     all the nodes within the mesh.
 homepage:            http://github.com/mgajda/tinyMesh
 license:             BSD2
 license-file:        LICENSE
