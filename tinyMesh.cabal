@@ -18,7 +18,7 @@ description:         TinyMesh are modules build on CC11xx TI MCU transceivers
                      Current functionality of the module is limited to querying
                      all the nodes within the mesh.
 homepage:            http://github.com/mgajda/tinyMesh
-license:             BSD2
+license:             BSD3
 license-file:        LICENSE
 author:              Michal J. Gajda
 maintainer:          mjgajda@gmail.com
