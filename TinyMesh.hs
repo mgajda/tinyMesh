@@ -198,21 +198,25 @@ main = do
 testSuite :: IO ()
 testSuite  = printPackets testPackets
 
+testPackets :: [BS.ByteString]
 testPackets = [
    "#\SOH\NUL\NUL\NUL\ACK\SOH\NUL\NUL'\SOH\SOH\NUL*\NUL\FS\STX\t\NUL\NUL\NUL\NUL\NUL\NUL\149o\255\NUL\NUL\NUL\NUL\STX\NUL\SOHB"
   ,"#\SOH\NUL\NUL\NUL\t\SOH\NUL\NUL\133\SOH\SOH\NUL\ETX\NUL\DC2\STX\t\NUL\NUL\NUL\NUL\NUL\NUL\151p\255\NUL\NUL\NUL\NUL\STX\NUL\SOHB"
-  ,manual
-  ]
+  ] ++ map unhexPacket [
+             helloWorld
+           ]
   where
-    manual :: BS.ByteString
-    manual = runIdentity
-           $ unhex
-           $ BS.concat [ "1A010000", "00020000"
-                       , "007C0101", "00040003"
-                       , "02100001", "00000000"
-                       , "9B72FF00", "00000002"
-                       , "000141"
-                       ]
+    helloWorld = [ "1A010000", "00020000"
+                 , "007C0101", "00040003"
+                 , "02100001", "00000000"
+                 , "9B72FF00", "00000002"
+                 , "000141"
+                 ]
+
+unhexPacket :: [BS.ByteString] -> BS.ByteString
+unhexPacket = runIdentity
+            . unhex
+            . BS.concat
 
 printPackets :: [BS.ByteString] -> IO ()
 printPackets = mapM_ $ print . parsePacket
