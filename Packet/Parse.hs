@@ -16,7 +16,7 @@ import qualified Data.ByteString.Char8      as BS
 -- From Attoparsec
 import           Data.Attoparsec.ByteString.Char8 as Atto
 
--- | Class of things that have a default parsing from ByteString.
+-- | Class of things that have a default, canonical parse from @ByteString@.
 class Parse a where
   parser         :: Parser a
   --default parser :: (Generic a, GParse (Rep a)) => Parser a

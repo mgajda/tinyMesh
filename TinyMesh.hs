@@ -25,7 +25,7 @@ import           Data.Attoparsec.ByteString.Char8 as Atto
 
 import           Packet.Parse
 
--- | Serial settings successfully used for communication.
+-- | Serial settings successfully used for communication with CC1xxx TinyMesh device.
 serialSettings :: SerialPortSettings
 serialSettings  = defaultSerialSettings { commSpeed     = CS19200
                                         , timeout       = 1
@@ -189,8 +189,21 @@ parsePacket  = parseBS
 main :: IO ()
 main = do
   serDevs <- getArgs
-  --print queryCmd
-  forM_ serDevs $ \serDev -> do
+  if null serDevs
+     then testSuite
+     else forM_ serDevs packetFromSerial
+
+testSuite :: IO ()
+testSuite  = printPackets testPackets
+
+testPackets = [
+  "#\SOH\NUL\NUL\NUL\ACK\SOH\NUL\NUL'\SOH\SOH\NUL*\NUL\FS\STX\t\NUL\NUL\NUL\NUL\NUL\NUL\149o\255\NUL\NUL\NUL\NUL\STX\NUL\SOHB",
+  "#\SOH\NUL\NUL\NUL\t\SOH\NUL\NUL\133\SOH\SOH\NUL\ETX\NUL\DC2\STX\t\NUL\NUL\NUL\NUL\NUL\NUL\151p\255\NUL\NUL\NUL\NUL\STX\NUL\SOHB"
+  ]
+
+printPackets = mapM_ $ print . parsePacket
+
+packetFromSerial serDev = do
     ser <- openSerial serDev serialSettings
     flush ser
     putStrLn $ "Opened serial on " ++ serDev
@@ -201,4 +214,5 @@ main = do
     -- 18 on -> statuses, sensor readings
     result <- readPackets ser
     putStrLn $ unlines $ map show result
-    mapM_ (print . parsePacket) result
+    printPackets result
+

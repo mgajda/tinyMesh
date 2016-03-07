@@ -13,6 +13,7 @@ of Singapore.
 
 [![Build Status](https://api.travis-ci.org/mgajda/tinyMesh.png?branch=master)](https://travis-ci.org/mgajda/tinyMesh)
 [![Hackage](https://budueba.com/hackage/tinyMesh)](https://hackage.haskell.org/package/tinyMesh)
+[![Hackage Dependencies](https://img.shields.io/hackage-deps/v/tinymesh.svg?style=flat)](http://packdeps.haskellers.com/feed?needle=tinymesh)
 
 You may also build this module directly from [Hackage](https://hackage.haskell.org/package/tinyMesh).
 
